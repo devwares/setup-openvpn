@@ -45,7 +45,7 @@ server)
     apt -y update && apt -y upgrade
 
     # Select packages
-    pkglist="openvpn"
+    pkglist="openvpn gzip"
 
     # Install packages
     apt-get -qy install $pkglist
@@ -104,6 +104,31 @@ server)
     echo "Server and client's certificates and keys have all been generated and are stored in the appropriate directories on your server."
     echo "We can now move to configuring OpenVPN server"
 
+    # Sample conf
+    cp /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz /etc/openvpn/
+    gzip -d /etc/openvpn/server.conf.gz
+
+    # /etc/openvpn/server.conf
+    declare -A confs
+    confs=(
+          [;tls-auth]="tls-auth"
+          [ta.key 1]="ta.key 0"
+          [;cipher AES-256-CBC]="cipher AES-256-CBC"
+          [cipher AES-256-CBC]="cipher AES-256-CBC\nauth SHA256"
+          [dh dh2048.pem]="dh dh.pem"
+          [;user nobody]="user nobody"
+          [;group nogroup]="group nogroup"
+          [port 1194]="port $openvpnserverport"
+    )
+    if [ `lowercase $openvpnserverprotocol` = "tcp" ]; then
+    confs+=(
+          [;proto tcp]="proto tcp"
+          [proto udp]=";proto udp"
+          [explicit-exit-notify 1]="explicit-exit-notify 0"
+    )
+    fi
+    strreplaceinfile "/etc/openvpn/server.conf"
+
 ;;
 
 ca)
@@ -150,7 +175,6 @@ ca)
     cd "$easyrsasubdir"
     ./easyrsa init-pki
     ./easyrsa build-ca nopass
-#    ./easyrsa --batch build-ca nopass
 
     # Ready to start signing certificate requests
     echo Ready to start signing certificate requests. Please now run the install script on Openvpn server.
@@ -177,3 +201,6 @@ ca)
 *) echo Unknow type "$cfgprofile" ;;
 
 esac
+
+# DEBUG
+# fi
