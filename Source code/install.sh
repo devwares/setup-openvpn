@@ -129,6 +129,10 @@ server)
     fi
     strreplaceinfile "/etc/openvpn/server.conf"
 
+    echo
+    echo OpenVpn server configuration complete.
+    echo Client Certificate and Key Pair generating script moved to "$gencckpfile"
+
 ;;
 
 ca)
