@@ -36,8 +36,6 @@ case $cfgprofile in
 
 server)
 
-if false; then
-
     # Set hostname
     echo $openvpnserverhostname > /etc/hostname
     hostname $openvpnserverhostname
@@ -131,9 +129,6 @@ if false; then
     )
     fi
     strreplaceinfile "/etc/openvpn/server.conf"
-
-# DEBUG
-fi
 
     # $ccdir/base.conf
     declare -A confs
