@@ -25,13 +25,13 @@ fi
 clientname="`filenamewithoutext "$1"`"
 
 cd "$EASYRSADIR"
-#./easyrsa import-req "$1" $clientname
+./easyrsa import-req "$1" $clientname
 if ! [ $? -lt 1 ]; then
   echo "Error during import process"
   exit
 fi
 
-#./easyrsa sign-req client $clientname
+./easyrsa sign-req client $clientname
 if ! [ $? -lt 1 ]; then
   echo "Error during signing process"
   exit
