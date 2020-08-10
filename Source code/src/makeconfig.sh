@@ -21,3 +21,10 @@ cat ${BASE_CONFIG} \
     ${KEY_DIR}/ta.key \
     <(echo -e '</tls-auth>') \
     > ${OUTPUT_DIR}/${1}.ovpn
+
+if ! [ $? -lt 1 ]; then
+  echo "Error during config make"
+  exit
+fi
+
+echo Configuration file generated : "${OUTPUT_DIR}/${1}.ovpn"

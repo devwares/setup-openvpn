@@ -65,8 +65,8 @@ server)
 
     echo Private key and certificate request generated.
     echo You can now transfer the server.req file to your CA machine using a secure method.
-    echo Local path on CA machine : "$PWD/pki/reqs/$openvpnserverhostname.req"
-    echo Remote path on Openvpn server : displayed by install script
+    echo Local path on OpenVPN server : "$PWD/pki/reqs/$openvpnserverhostname.req"
+    echo Remote path on CA host : displayed by install script
     echo
     echo Continue when you have transfered $openvpnserverhostname.crt and ca.crt files into "/etc/openvpn"
     echo
@@ -99,6 +99,7 @@ server)
           [%%LIBPATH%%]="$LIBPATH"
           [%%CCDIR%%]="$ccdir"
           [%%EASYRSADIR%%]="$easyrsabasedir/$easyrsasubdir"
+          [%%MAKECONFIGFILE%%]="$makeconfigfile"
     )
     strreplaceinfile "$gencckpfile"
 
@@ -116,6 +117,8 @@ server)
           [ta.key 1]="ta.key 0"
           [;cipher AES-256-CBC]="cipher AES-256-CBC"
           [cipher AES-256-CBC]="cipher AES-256-CBC\nauth SHA256"
+          [cert server.crt]="cert $openvpnserverhostname.crt"
+          [key server.key]="key $openvpnserverhostname.key"
           [dh dh2048.pem]="dh dh.pem"
           [;user nobody]="user nobody"
           [;group nogroup]="group nogroup"
