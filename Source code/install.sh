@@ -30,11 +30,13 @@ else
 fi
 
 # DEBUG
-# if false; then
+#if false; then
 
 case $cfgprofile in
 
 server)
+
+if false; then
 
     # Set hostname
     echo $openvpnserverhostname > /etc/hostname
@@ -87,6 +89,7 @@ server)
     echo All the certificate and key files needed by the server have been generated.
 
     # Prepare client configs
+    mkdir -p "$ccdir/files"
     mkdir -p "$ccdir/keys"
     chmod -R 700 "$ccdir"
     cp -f ./ta.key "$ccdir/keys/"
@@ -129,9 +132,32 @@ server)
     fi
     strreplaceinfile "/etc/openvpn/server.conf"
 
+# DEBUG
+fi
+
+    # $ccdir/base.conf
+    declare -A confs
+    confs=(
+          [%%openvpnserveraddress%%]="$openvpnserveraddress"
+          [%%openvpnserverport%%]="$openvpnserverport"
+          [%%openvpnserverprotocol%%]="$openvpnserverprotocol"
+    )
+    cp -f "$SOURCEPATH/base.conf" "$baseclientconfigfile"
+    strreplaceinfile "$baseclientconfigfile"
+
+    # $ccdir/makeconfig.sh
+    declare -A confs
+    confs=(
+          [%%CCDIR%%]="$ccdir"
+    )
+    cp -f "$SOURCEPATH/makeconfig.sh" "$makeconfigfile"
+    strreplaceinfile "$makeconfigfile"
+    chmod 700 "$makeconfigfile"
+
     echo
     echo OpenVpn server configuration complete.
-    echo Client Certificate and Key Pair generating script moved to "$gencckpfile"
+    echo Client Certificate and Key Pair generation script moved to "$gencckpfile"
+    echo Client Configuration generation script moved to "$makeconfigfile"
 
 ;;
 
