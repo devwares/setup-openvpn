@@ -1,5 +1,5 @@
 #!/bin/bash
-SCRIPT=$(realpath $0)
+SCRIPT=$(realpath "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 LIBPATH="%%LIBPATH%%"
 SOURCEPATH="$SCRIPTPATH/src"

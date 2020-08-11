@@ -1,5 +1,5 @@
 #!/bin/bash
-SCRIPT=$(realpath $0)
+SCRIPT=$(realpath "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 LIBPATH="/usr/local/bin/w-tools/Source code" # Access must remain after install
 SOURCEPATH="$SCRIPTPATH/src"
@@ -152,10 +152,15 @@ server)
     strreplaceinfile "$makeconfigfile"
     chmod 700 "$makeconfigfile"
 
+    # Revocation
+    touch /etc/openvpn/crl.pem
+    chmod 644 /etc/openvpn/crl.pem
+    echo 'crl-verify /etc/openvpn/crl.pem' >> /etc/openvpn/server.conf
+
     echo
-    echo OpenVpn server configuration complete.
     echo Client Certificate and Key Pair generation script moved to "$gencckpfile"
     echo Client Configuration generation script moved to "$makeconfigfile"
+    echo OpenVpn server configuration complete. Please reboot the server.
 
 ;;
 
@@ -198,6 +203,15 @@ ca)
           [%%EASYRSADIR%%]="$easyrsabasedir/$easyrsasubdir"
     )
     strreplaceinfile "$signclientreqscriptfile"
+
+    # Revoke user script
+    cp -f "$SOURCEPATH/revoke-user.sh" "$revokeuserscriptfile"
+    chmod 700 "$revokeuserscriptfile"
+    declare -A confs
+    confs=(
+          [%%EASYRSADIR%%]="$easyrsabasedir/$easyrsasubdir"
+    )
+    strreplaceinfile "$revokeuserscriptfile"
 
     # Generate public certificate (ca.crt) and private key (ca.key)
     cd "$easyrsasubdir"
