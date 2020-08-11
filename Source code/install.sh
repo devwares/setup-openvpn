@@ -64,11 +64,14 @@ server)
     cp -f pki/private/$openvpnserverhostname.key /etc/openvpn
 
     echo Private key and certificate request generated.
-    echo You can now transfer the server.req file to your CA machine using a secure method.
+    echo You can now transfer the $openvpnserverhostname.req file to your CA machine using a secure method.
     echo Local path on OpenVPN server : "$PWD/pki/reqs/$openvpnserverhostname.req"
     echo Remote path on CA host : displayed by install script
     echo
-    echo Continue when you have transfered $openvpnserverhostname.crt and ca.crt files into "/etc/openvpn"
+    echo Continue once you have transferred the following files into "/etc/openvpn" : 
+    echo '- crl.pem'
+    echo '-' $openvpnserverhostname.crt
+    echo '- ca.crt'
     echo
     echo Press any key to continue...
     pressakey
@@ -155,7 +158,7 @@ server)
     # Revocation
     touch /etc/openvpn/crl.pem
     chmod 644 /etc/openvpn/crl.pem
-    echo 'crl-verify /etc/openvpn/crl.pem' >> /etc/openvpn/server.conf
+    echo -e \\n'# Revocation'\\n'crl-verify /etc/openvpn/crl.pem' >> /etc/openvpn/server.conf
 
     echo
     echo Client Certificate and Key Pair generation script moved to "$gencckpfile"
@@ -231,9 +234,15 @@ ca)
     # Sign the request
     ./easyrsa sign-req server $openvpnserverhostname
 
+    # Generate crl.pem file
+    ./easyrsa gen-crl
+
     # Ask for transfer to Openvpn server
-    echo Next, copy the server.crt and ca.crt files into Openvpn server "/etc/openvpn/" directory
-    echo local path : "$easyrsabasedir/$easyrsasubdir/pki/issued/$openvpnserverhostname.crt" and "$easyrsabasedir/$easyrsasubdir/pki/ca.crt"
+    echo Next, copy the $openvpnserverhostname.crt, ca.crt and crl.pem files into Openvpn server "/etc/openvpn/" directory
+    echo local paths :
+    echo '-' "$easyrsabasedir/$easyrsasubdir/pki/issued/$openvpnserverhostname.crt"
+    echo '-' "$easyrsabasedir/$easyrsasubdir/pki/ca.crt"
+    echo '-' "$easyrsabasedir/$easyrsasubdir/pki/crl.pem"
     echo
     echo CA machine configuration complete.
     echo Client request signing script moved to "$signclientreqscriptfile"
